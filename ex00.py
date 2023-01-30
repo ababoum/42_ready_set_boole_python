@@ -16,3 +16,8 @@ if __name__ == "__main__":
     print(adder(0, 2147483647))
     print(adder(2147483647, 2147483647))
     print(adder(5, 3))
+
+    assert adder(1, 2) == 3
+    assert adder(0, 2147483647) == 2147483647
+    assert adder(2147483647, 2147483647) == 4294967294
+    assert adder(5, 3) == 8

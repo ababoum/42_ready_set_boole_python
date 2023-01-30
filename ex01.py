@@ -24,3 +24,8 @@ if __name__ == "__main__":
     print(multiplier(0, 2147483647))
     print(multiplier(100, 100))
     print(multiplier(5, 3))
+    
+    assert multiplier(1, 2) == 2
+    assert multiplier(0, 2147483647) == 0
+    assert multiplier(100, 100) == 10000
+    assert multiplier(5, 3) == 15
