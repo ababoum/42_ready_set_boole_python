@@ -1,3 +1,42 @@
+from anytree import Node, RenderTree
+
+
+def parse(formula: str) -> Node:
+    """Parses a formula.
+    Args:
+        formula: A string representing a formula.
+    Raises:
+        TypeError: If the formula is not a string.
+        ValueError: If the formula is invalid.
+    Returns:
+        The root node of the formula tree.
+    """
+    if not isinstance(formula, str):
+        raise TypeError(f"Formula must be a string, not {type(formula)}")
+    if any(char not in '01!&|^>=' for char in formula):
+        raise ValueError(f"Invalid formula '{formula}'")
+
+
+    # Create the tree
+    root = Node(formula)
+    stack = [root]
+    for char in formula:
+        if char.isalpha() and char.isupper():
+            stack[-1].children = [Node(char), Node(char)]
+            stack.append(stack[-1].children[0])
+        elif char == '!':
+            stack[-1].children = [Node(char), Node(char)]
+            stack.append(stack[-1].children[0])
+        elif char in '&|^>=':
+            stack[-1].name = char
+            stack.pop()
+        else:
+            raise ValueError(f"Invalid character '{char}' in formula")
+
+    return root 
+
+
+
 def eval_formula(formula: str) -> bool:
     """Evaluates a formula.
     Args:
