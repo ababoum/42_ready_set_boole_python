@@ -1,37 +1,52 @@
-# O(log n) time complexity
-def append_on_all(stacks, value):
-    for stack in stacks:
-        stack.append(value)
-
-# O(n) time complexity
-
-
-def check_formula(formula: str) -> bool:
-    if any(char not in '!&|^>=' or not char.isalpha() for char in formula):
-        return False
-    return True
+from anytree import Node, RenderTree
+from ex03 import parse_formula, eval_node, eval_formula
+import copy
 
 
 def print_truth_table(formula: str) -> None:
-    """Prints the truth table of a given formula.
+    """Evaluates a formula.
     Args:
-        formula: The formula to print the truth table of.
+        formula: A string representing a formula.
     Raises:
         TypeError: If the formula is not a string.
         ValueError: If the formula is invalid.
+    Returns:
+        Result of the formula evaluation as a boolean.
     """
-    if not isinstance(formula, str):
-        raise TypeError(f"Formula must be a string, not {type(formula)}")
-    if not check_formula(formula):
-        raise ValueError(f"Invalid formula '{formula}'")
 
-    # Get the variables in the formula
-    formulas = []
-    variables = set()
+    # Check if the formula is valid variables-wise
+    alphabet = list()
     for char in formula:
-        if char.isalpha() and char.isupper() and char not in variables:
-            variables.add(char)
-            stacks.append(*stacks)
-            append_on_all(stacks[0:len(stacks) // 2], False)
-            append_on_all(stacks[len(stacks) // 2:], True)
-        
+        if char.isalpha() and char.isupper():
+            alphabet.append(char)
+
+    print(f"Truth table for formula '{formula}'")
+    print(f"| {' | '.join(alphabet)} | = |")
+    print(f"|{'|'.join(['---'] * (1 + len(alphabet)))}|")
+
+    for i in range(2 ** len(alphabet)):
+        formula_c = copy.copy(formula)
+        # O(1) because the alphabet is always the same (<26)
+        for char in alphabet[::-1]:
+            if i % 2 == 0:
+                formula_c = formula_c.replace(char, '0')
+            else:
+                formula_c = formula_c.replace(char, '1')
+            i //= 2
+        print(
+            f"| {' | '.join(filter(lambda x: x.isnumeric(), formula_c))} | {(0,1)[eval_formula(formula_c)]} |")
+
+
+if __name__ == "__main__":
+    print_truth_table('AB&')
+    print('*' * 25)
+    print_truth_table('AB|')
+    print('*' * 25)
+    print_truth_table('A')
+    print('*' * 25)
+    print_truth_table('AB&C|')
+    print('*' * 25)
+    try:
+        print_truth_table('A^C|')
+    except ValueError as e:
+        print(e)

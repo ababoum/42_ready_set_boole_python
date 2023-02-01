@@ -1,7 +1,8 @@
 from anytree import Node, RenderTree
 
 
-def parse(formula: str) -> Node:
+# O(n) complexity -> One formula traversal
+def parse_formula(formula: str, show_tree: bool = False) -> Node:
     """Parses a formula.
     Args:
         formula: A string representing a formula.
@@ -17,7 +18,6 @@ def parse(formula: str) -> Node:
         raise ValueError(f"Invalid formula '{formula}'")
 
     # Create the tree
-
     stack = []
     for char in formula:
         if char == '0' or char == '1':
@@ -49,9 +49,18 @@ def parse(formula: str) -> Node:
         else:
             raise ValueError(f"Invalid character '{char}' in formula")
 
+    # Check if the tree is valid
+    if len(stack) != 1:
+        raise ValueError(f"Invalid formula '{formula}'")
+
+    if show_tree:
+        for pre, fill, node in RenderTree(stack[0]):
+            print("%s%s" % (pre, node.name))
+
     return stack[0]
 
 
+# O(n) complexity -> One tree traversal
 def eval_node(node: Node) -> bool:
     """Evaluates a node.
     Args:
@@ -62,6 +71,7 @@ def eval_node(node: Node) -> bool:
     Returns:
         Result of the formula evaluation as a boolean.
     """
+
     if not isinstance(node, Node):
         raise TypeError(f"Node must be a Node, not {type(node)}")
     if node.is_leaf:
@@ -87,7 +97,7 @@ def eval_node(node: Node) -> bool:
         raise ValueError(f"Invalid node '{node.name}'")
 
 
-def eval_formula(formula: str) -> bool:
+def eval_formula(formula: str, show_tree: bool = False) -> bool:
     """Evaluates a formula.
     Args:
         formula: A string representing a formula.
@@ -97,60 +107,19 @@ def eval_formula(formula: str) -> bool:
     Returns:
         Result of the formula evaluation as a boolean.
     """
-
-    if not isinstance(formula, str):
-        raise TypeError(f"Formula must be a string, not {type(formula)}")
-
-    stack = []
-    for char in formula:
-        if char == '0':
-            stack.append(False)
-        elif char == '1':
-            stack.append(True)
-        elif char == '!':
-            if len(stack) == 0:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-1] = not stack[-1]
-        elif char == '&':
-            if len(stack) < 2:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-2] = stack[-2] and stack[-1]
-            stack.pop()
-        elif char == '|':
-            if len(stack) < 2:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-2] = stack[-2] or stack[-1]
-            stack.pop()
-        elif char == '^':
-            if len(stack) < 2:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-2] = stack[-2] ^ stack[-1]
-            stack.pop()
-        elif char == '>':
-            if len(stack) < 2:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-2] = not stack[-2] or stack[-1]
-            stack.pop()
-        elif char == '=':
-            if len(stack) < 2:
-                raise ValueError(f"Invalid formula '{formula}'")
-            stack[-2] = (not stack[-2] or stack[-1]
-                         ) and (not stack[-1] or stack[-2])
-            stack.pop()
-        else:
-            raise ValueError(f"Invalid character '{char}' in formula")
-
-    if len(stack) != 1:
-        raise ValueError(f"Invalid formula '{formula}'")
-    return stack[0]
+    return eval_node(parse_formula(formula, show_tree=show_tree))
 
 
 if __name__ == "__main__":
-    print(eval_formula("10&"))
-    print(eval_formula("10|"))
-    print(eval_formula("11>"))
-    print(eval_formula("10="))
-    print(eval_formula("1011||="))
+    print(eval_formula("10&", True))
+    print('*' * 25)
+    print(eval_formula("10|", True))
+    print('*' * 25)
+    print(eval_formula("11>", True))
+    print('*' * 25)
+    print(eval_formula("10=", True))
+    print('*' * 25)
+    print(eval_formula("1011||=", True))
 
     assert eval_formula("10&") == False
     assert eval_formula("10|") == True
