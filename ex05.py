@@ -99,6 +99,7 @@ def NNF_transform(root: Node) -> Node:
                         ])
         else:
             root = Node("!", children=[NNF_transform(root.children[0])])
+
     elif root.name == ">":
         right = copy.deepcopy(root.children[0])
         left = copy.deepcopy(root.children[1])
@@ -119,124 +120,31 @@ def NNF_transform(root: Node) -> Node:
             NNF_transform(Node("&", children=[right, left]))
         ]))
 
-    # elif root.name == "=":
-    #     left = copy.deepcopy(root.children[0])
-    #     right = copy.deepcopy(root.children[1])
-    #     left_2 = copy.deepcopy(root.children[0])
-    #     right_2 = copy.deepcopy(root.children[1])
-    #     root = NNF_transform(Node("&", children=[
-    #         NNF_transform(
-    #             Node(">", children=[left, right])),
-    #         NNF_transform(
-    #             Node(">", children=[right_2, left_2]))
-    #     ]))
-
-    # elif root.name == '&':
-    #     if root.children[0].name == '|':
-    #         common = copy.deepcopy(root.children[1])
-    #         left = copy.deepcopy(root.children[0].children[0])
-    #         right = copy.deepcopy(root.children[0].children[1])
-    #         root = Node('|', children=[
-    #             NNF_transform(
-    #                 Node('&', children=[NNF_transform(common), NNF_transform(left)])),
-    #             NNF_transform(
-    #                 Node('&', children=[NNF_transform(common), NNF_transform(right)]))
-    #         ])
-    #     elif root.children[1].name == '|':
-    #         common = copy.deepcopy(root.children[0])
-    #         left = copy.deepcopy(root.children[1].children[0])
-    #         right = copy.deepcopy(root.children[1].children[1])
-    #         root = Node('|', children=[
-    #             NNF_transform(
-    #                 Node('&', children=[NNF_transform(common), NNF_transform(left)])),
-    #             NNF_transform(
-    #                 Node('&', children=[NNF_transform(common), NNF_transform(right)]))
-    #         ])
-    #     elif root.children[0].name == '0':
-    #         root = Node('0')
-    #     elif root.children[1].name == '0':
-    #         root = Node('0')
-    #     elif root.children[0].name == '1':
-    #         root = NNF_transform(root.children[1])
-    #     elif root.children[1].name == '1':
-    #         root = NNF_transform(root.children[0])
-    #     else:
-    #         left = NNF_transform(root.children[0])
-    #         right = NNF_transform(root.children[1])
-
-    #         # tautology
-    #         if left.name.isalpha() and right.name == '!' and right.children[0].name.isalpha():
-    #             if left.name == right.children[0].name:
-    #                 root = Node('0')
-    #         elif right.name.isalpha() and left.name == '!' and left.children[0].name.isalpha():
-    #             if right.name == left.children[0].name:
-    #                 root = Node('0')
-
-    # elif root.name == '|':
-    #     if root.children[0].name == '&':
-    #         common = copy.deepcopy(root.children[1])
-    #         left = copy.deepcopy(root.children[0].children[0])
-    #         right = copy.deepcopy(root.children[0].children[1])
-    #         root = Node('&', children=[
-    #             NNF_transform(
-    #                 Node('|', children=[NNF_transform(common), NNF_transform(left)])),
-    #             NNF_transform(
-    #                 Node('|', children=[NNF_transform(common), NNF_transform(right)]))
-    #         ])
-    #     elif root.children[1].name == '&':
-    #         common = copy.deepcopy(root.children[0])
-    #         left = copy.deepcopy(root.children[1].children[0])
-    #         right = copy.deepcopy(root.children[1].children[1])
-    #         root = Node('&', children=[
-    #             NNF_transform(
-    #                 Node('|', children=[NNF_transform(common), NNF_transform(left)])),
-    #             NNF_transform(
-    #                 Node('|', children=[NNF_transform(common), NNF_transform(right)]))
-    #         ])
-    #     elif root.children[0].name == '1':
-    #         root = Node('1')
-    #     elif root.children[1].name == '1':
-    #         root = Node('1')
-    #     elif root.children[0].name == '0':
-    #         root = NNF_transform(root.children[1])
-    #     elif root.children[1].name == '0':
-    #         root = NNF_transform(root.children[0])
-    #     else:
-    #         left = NNF_transform(root.children[0])
-    #         right = NNF_transform(root.children[1])
-
-    #         # tautology
-    #         if left.name.isalpha() and right.name == '!' and right.children[0].name.isalpha():
-    #             if left.name == right.children[0].name:
-    #                 root = Node('1')
-    #         elif right.name.isalpha() and left.name == '!' and left.children[0].name.isalpha():
-    #             if right.name == left.children[0].name:
-    #                 root = Node('1')
-
     return copy.deepcopy(root)
 
 
-def negation_normal_form(formula: str) -> str:
+def negation_normal_form(formula: str, show_tree=False) -> str:
     tree = parse_formula(formula)
 
     tree = NNF_transform(tree)
 
-    # for pre, fill, node in RenderTree(tree):
-    #     print("%s%s" % (pre, node.name))
+    if show_tree:
+        for pre, fill, node in RenderTree(tree):
+            print("%s%s" % (pre, node.name))
 
     return collapse_tree(tree)
 
 
 if __name__ == "__main__":
-    print(negation_normal_form("AB&!"))
+    print(negation_normal_form("AB&!", show_tree=True))
     print('*' * 25)
-    print(negation_normal_form("AB|!"))
+    print(negation_normal_form("AB|!", show_tree=True))
     print('*' * 25)
-    print(negation_normal_form("AB>"))
+    print(negation_normal_form("AB>", show_tree=True))
     print('*' * 25)
-    print(negation_normal_form("AB="))
+    print(negation_normal_form("AB=", show_tree=True))
     print('*' * 25)
-    print(negation_normal_form("AB|C&!"))
+    print(negation_normal_form("AB|C&!", show_tree=True))
     print('*' * 25)
 
     assert negation_normal_form("AB&!") == "A!B!|"
